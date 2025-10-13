@@ -1,0 +1,58 @@
+{
+  "name": "n8n-nodes-assistro",
+  "version": "1.0.0",
+  "description": "Send WhatsApp messages or media using SyncMate Assistro API.",
+  "keywords": [
+    "n8n-community-node-package",
+    "whatsapp",
+    "assistro",
+    "syncmate",
+    "automation"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/<your-repo>/n8n-nodes-assistro#readme",
+  "author": "Assistro Technologies <support@assistro.co>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/<your-repo>/n8n-nodes-assistro.git"
+  },
+  "engines": {
+    "node": ">=20.19 <=24"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "npx rimraf dist && tsc && gulp build:icons",
+    "dev": "tsc --watch",
+    "format": "prettier nodes credentials --write",
+    "lint": "eslint nodes credentials",
+    "lintfix": "eslint nodes credentials package.json --fix",
+    "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "nodes": [
+      "dist/nodes/WhatsAuto/WhatsAuto.node.js"
+    ],
+    "credentials": [
+      "dist/nodes/WhatsAuto/credentials/AssistroOAuth2Api.credentials.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.2",
+    "@typescript-eslint/parser": "~8.32.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-n8n-nodes-base": "^1.16.3",
+    "gulp": "^5.0.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "^1.111.0"
+  },
+  "dependencies": {
+    "n8n-core": "^1.113.1",
+    "n8n-nodes-whatsapp": "^0.0.5"
+  }
+}
