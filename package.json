@@ -10,11 +10,11 @@
     "automation"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/<your-repo>/n8n-nodes-assistro#readme",
+  "homepage": "https://github.com/heratshah-collab/n8n-nodes-assistro#readme",
   "author": "Assistro Technologies <support@assistro.co>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/<your-repo>/n8n-nodes-assistro.git"
+    "url": "git+https://github.com/heratshah-collab/n8n-nodes-assistro.git"
   },
   "engines": {
     "node": ">=20.19 <=24"
