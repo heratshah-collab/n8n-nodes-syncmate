@@ -1,5 +1,5 @@
 {
-  "name": "n8n-nodes-assistro",
+  "name": "n8n-nodes-syncmate",
   "version": "1.0.0",
   "description": "Send WhatsApp messages or media using SyncMate Assistro API.",
   "keywords": [
@@ -11,7 +11,10 @@
   ],
   "license": "MIT",
   "homepage": "https://github.com/heratshah-collab/n8n-nodes-assistro#readme",
-  "author": "Assistro Technologies <support@assistro.co>",
+  "author": {
+    "name": "Assistro Technologies",
+    "email": "support@assistro.co"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/heratshah-collab/n8n-nodes-assistro.git"
@@ -32,6 +35,7 @@
     "dist"
   ],
   "n8n": {
+    "n8nNodesApiVersion": 1,
     "nodes": [
       "dist/nodes/WhatsAuto/WhatsAuto.node.js"
     ],
