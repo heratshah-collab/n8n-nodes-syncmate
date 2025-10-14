@@ -10,19 +10,19 @@
     "automation"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/heratshah-collab/n8n-nodes-assistro#readme",
+  "homepage": "https://github.com/heratshah-collab/n8n-nodes-syncmate#readme",
   "author": {
     "name": "Assistro Technologies",
     "email": "support@assistro.co"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/heratshah-collab/n8n-nodes-assistro.git"
+    "url": "git+https://github.com/heratshah-collab/n8n-nodes-syncmate.git"
   },
   "engines": {
-    "node": ">=20.19 <=24"
+     "node": ">=20.19.0 <=24.0.0"
   },
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "npx rimraf dist && tsc && gulp build:icons",
     "dev": "tsc --watch",
@@ -32,7 +32,9 @@
     "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
   },
   "files": [
-    "dist"
+    "dist",
+    "package.json",
+    "README.md"
   ],
   "n8n": {
     "n8nNodesApiVersion": 1,
