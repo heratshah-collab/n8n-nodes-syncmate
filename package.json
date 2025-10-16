@@ -1,19 +1,6 @@
 {
   "name": "n8n-nodes-syncmate",
-  "version": "1.0.1",
-  "author": {
-    "name": "Assistro Technologies",
-    "email": "support@assistro.co"
-  },
-  "n8n": {
-    "n8nNodesApiVersion": 1,
-    "nodes": [
-      "dist/nodes/WhatsAuto/WhatsAuto.node.js"
-    ],
-    "credentials": [
-      "dist/nodes/WhatsAuto/credentials/AssistroOAuth2Api.credentials.js"
-    ]
-  },
+  "version": "1.0.2",
   "description": "Send WhatsApp messages or media using SyncMate Assistro API.",
   "keywords": [
     "n8n-community-node-package",
@@ -24,21 +11,24 @@
   ],
   "license": "MIT",
   "homepage": "https://github.com/heratshah-collab/n8n-nodes-syncmate#readme",
+  "author": {
+    "name": "Assistro Technologies",
+    "email": "support@assistro.co"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/heratshah-collab/n8n-nodes-syncmate.git"
   },
   "engines": {
-    "node": ">=22.14.0 <=24.0.0"
+     "node": ">=22.14.0 <=24.0.0"
   },
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "npx rimraf dist && tsc && gulp build:icons",
     "dev": "tsc --watch",
     "format": "prettier nodes credentials --write",
     "lint": "eslint nodes credentials",
     "lintfix": "eslint nodes credentials package.json --fix",
-    "scan": "npx @n8n/scan-community-package .",
     "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
   },
   "files": [
@@ -46,12 +36,19 @@
     "package.json",
     "README.md"
   ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "nodes": [
+      "dist/nodes/WhatsAuto/WhatsAuto.node.js"
+    ],
+    "credentials": [
+      "dist/nodes/WhatsAuto/credentials/AssistroOAuth2Api.credentials.js"
+    ]
+  },
   "devDependencies": {
-    "@n8n/node-cli": "^0.13.0",
-    "@n8n/scan-community-package": "^0.7.0",
     "@types/node": "^24.6.2",
     "@typescript-eslint/parser": "~8.32.0",
-    "eslint": "^9.0.0",
+    "eslint": "^8.57.0",
     "eslint-plugin-n8n-nodes-base": "^1.16.3",
     "gulp": "^5.0.0",
     "prettier": "^3.5.3",
@@ -63,8 +60,5 @@
   "dependencies": {
     "n8n-core": "^1.113.1",
     "n8n-nodes-whatsapp": "^0.0.5"
-  },
-  "bugs": {
-    "url": "https://github.com/heratshah-collab/n8n-nodes-syncmate/issues"
   }
 }
