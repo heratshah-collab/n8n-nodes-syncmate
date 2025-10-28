@@ -3,7 +3,6 @@ import {
     INodeExecutionData,
     INodeType,
     INodeTypeDescription,
-    NodeConnectionTypes,
     NodeOperationError ,
 } from 'n8n-workflow';
 
@@ -15,8 +14,8 @@ export class WhatsAuto implements INodeType {
         version: 1,
         description: 'Send WhatsApp messages or media using SyncMate.',
         defaults: { name: 'WhatsAuto' },
-        inputs: [NodeConnectionTypes.Main],
-        outputs: [NodeConnectionTypes.Main],
+        inputs: ['main'],
+        outputs: ['main'],
         subtitle: `={{ 
             $parameter["operation"] === "normal" ? "Send Notification" :
             $parameter["operation"] === "group" ? "Send Group Message" :

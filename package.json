@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-syncmate",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Send WhatsApp messages or media using SyncMate Assistro API.",
   "keywords": [
     "n8n-community-node-package",
@@ -20,21 +20,22 @@
     "url": "git+https://github.com/heratshah-collab/n8n-nodes-syncmate.git"
   },
   "engines": {
-    "node": ">=16.9.0"
+    "node": ">=18.10.0"
   },
   "main": "dist/index.js",
   "scripts": {
-    "build": "npx rimraf dist && tsc && gulp build:icons",
+    "build": "rimraf dist && tsc && gulp build:icons",
     "dev": "tsc --watch",
     "format": "prettier nodes credentials --write",
-    "lint": "eslint nodes credentials",
+    "lint": "eslint nodes credentials package.json",
     "lintfix": "eslint nodes credentials package.json --fix",
-    "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
+    "prepublishOnly": "npm run build && npm run lint"
   },
   "files": [
     "dist",
     "package.json",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "n8n": {
     "n8nNodesApiVersion": 1,
@@ -46,19 +47,17 @@
     ]
   },
   "devDependencies": {
-    "@types/node": "^20.6.2",
-    "@typescript-eslint/parser": "~8.32.0",
-    "eslint": "^8.45.0",
-    "eslint-plugin-n8n-nodes-base": "^1.16.3",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-n8n-nodes-base": "^1.16.0",
     "gulp": "^4.0.2",
     "prettier": "^3.0.0",
-    "typescript": "^5.0.4"
+    "rimraf": "^5.0.0",
+    "typescript": "^5.0.0"
   },
   "peerDependencies": {
-    "n8n-workflow": "^1.111.0"
-  },
-  "dependencies": {
-    "n8n-core": "^1.113.1",
-    "n8n-nodes-whatsapp": "^0.0.5"
+    "n8n-workflow": ">=1.0.0",
+    "n8n-core": ">=1.0.0"
   }
 }
