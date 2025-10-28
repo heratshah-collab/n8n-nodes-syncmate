@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-syncmate",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Send WhatsApp messages or media using SyncMate Assistro API.",
   "keywords": [
     "n8n-community-node-package",
@@ -20,7 +20,7 @@
     "url": "git+https://github.com/heratshah-collab/n8n-nodes-syncmate.git"
   },
   "engines": {
-     "node": ">=16.9.0"
+    "node": ">=16.9.0"
   },
   "main": "dist/index.js",
   "scripts": {
