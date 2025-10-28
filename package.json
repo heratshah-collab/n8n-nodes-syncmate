@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-syncmate",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Send WhatsApp messages or media using SyncMate Assistro API.",
   "keywords": [
     "n8n-community-node-package",
@@ -20,7 +20,7 @@
     "url": "git+https://github.com/heratshah-collab/n8n-nodes-syncmate.git"
   },
   "engines": {
-     "node": ">=22.14.0 <=24.0.0"
+     "node": ">=16.9.0"
   },
   "main": "dist/index.js",
   "scripts": {
@@ -42,17 +42,17 @@
       "dist/nodes/WhatsAuto/WhatsAuto.node.js"
     ],
     "credentials": [
-      "dist/nodes/WhatsAuto/credentials/AssistroOAuth2Api.credentials.js"
+      "dist/credentials/AssistroOAuth2Api.credentials.js"
     ]
   },
   "devDependencies": {
-    "@types/node": "^24.6.2",
+    "@types/node": "^20.6.2",
     "@typescript-eslint/parser": "~8.32.0",
-    "eslint": "^8.57.0",
+    "eslint": "^8.45.0",
     "eslint-plugin-n8n-nodes-base": "^1.16.3",
-    "gulp": "^5.0.0",
-    "prettier": "^3.5.3",
-    "typescript": "^5.8.3"
+    "gulp": "^4.0.2",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.4"
   },
   "peerDependencies": {
     "n8n-workflow": "^1.111.0"
