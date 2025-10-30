@@ -1,0 +1,28 @@
+{
+  "root": true,
+  "env": {
+    "node": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": ["./tsconfig.json"],
+    "sourceType": "module",
+    "ecmaVersion": 2022
+  },
+  "plugins": ["n8n-nodes-base"],
+  "extends": ["plugin:n8n-nodes-base/community"],
+  "rules": {
+    "n8n-nodes-base/node-class-description-inputs-wrong-regular-node": "error",
+    "n8n-nodes-base/node-class-description-outputs-wrong": "error",
+    "n8n-nodes-base/node-dirname-against-convention": "error",
+    "n8n-nodes-base/node-execute-block-double-assertion-for-items": "error",
+    "n8n-nodes-base/node-param-default-missing": "error",
+    "n8n-nodes-base/node-param-description-missing-final-period": "error",
+    "n8n-nodes-base/node-param-display-name-not-first-position": "error",
+    "n8n-nodes-base/node-param-name-untrimmed": "error",
+    "n8n-nodes-base/node-param-operation-option-without-action": "error",
+    "n8n-nodes-base/node-param-resource-without-no-data-expression": "error",
+    "n8n-nodes-base/cred-class-field-name-unsuffixed": "error",
+    "n8n-nodes-base/cred-class-name-unsuffixed": "error"
+  }
+}

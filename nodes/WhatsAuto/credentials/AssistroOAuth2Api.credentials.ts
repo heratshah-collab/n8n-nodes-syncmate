@@ -1,11 +1,15 @@
-import type { ICredentialType, INodeProperties } from 'n8n-workflow';
+import type {
+    IAuthenticateGeneric,
+    ICredentialTestRequest,
+    ICredentialType,
+    INodeProperties,
+} from 'n8n-workflow';
 
 export class AssistroOAuth2Api implements ICredentialType {
     name = 'assistroOAuth2Api';
     extends = ['oAuth2Api'];
     displayName = 'Assistro OAuth2 API';
     documentationUrl = 'https://docs.assistro.co/oauth';
-
     properties: INodeProperties[] = [
         {
             displayName: 'Grant Type',
@@ -34,10 +38,16 @@ export class AssistroOAuth2Api implements ICredentialType {
             default: 'all',
         },
         {
+            displayName: 'Auth URI Query Parameters',
+            name: 'authQueryParameters',
+            type: 'hidden',
+            default: '',
+        },
+        {
             displayName: 'Authentication',
             name: 'authentication',
             type: 'hidden',
-            default: 'header',
+            default: 'body',
         },
     ];
 }
