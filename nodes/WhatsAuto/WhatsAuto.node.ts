@@ -254,7 +254,7 @@ export class WhatsAuto implements INodeType {
                     };
                 }
 
-                const response = await this.helpers.requestOAuth2.call(
+                const response = await this.helpers.httpRequestWithAuthentication.call(
                     this,
                     'assistroOAuth2Api',
                     {
