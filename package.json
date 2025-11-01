@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-syncmate",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "Send WhatsApp messages or media using SyncMate Assistro API.",
   "keywords": [
     "n8n-community-node-package",

@@ -10,7 +10,7 @@ export class WhatsAuto implements INodeType {
     description: INodeTypeDescription = {
         displayName: 'WhatsApp Notifications by SyncMate',
         name: 'whatsAuto',
-        icon: 'file:WhatsAuto/whatsauto.svg',
+        icon: 'file:whatsauto.svg',
         group: ['output'],
         version: 1,
         subtitle: '={{$parameter["operation"]}}',
@@ -262,6 +262,7 @@ export class WhatsAuto implements INodeType {
                         url: 'https://app.assistro.co/api/v1/wapushplus/singlePass/message',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Integration' : 'n8n',
                         },
                         body,
                         json: true,
