@@ -17,14 +17,14 @@ export class AssistroOAuth2Api implements ICredentialType {
             displayName: 'Authorization URL',
             name: 'authUrl',
             type: 'hidden',
-            default: 'https://dev.app.assistro.co/oauth/authorize',
+            default: 'https://app.assistro.co/oauth/authorize',
             required: true,
         },
         {
             displayName: 'Access Token URL',
             name: 'accessTokenUrl',
             type: 'hidden',
-            default: 'https://dev.app.assistro.co/oauth/token',
+            default: 'https://app.assistro.co/oauth/token',
             required: true,
         },
         {
