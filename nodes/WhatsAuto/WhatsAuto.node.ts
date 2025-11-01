@@ -10,7 +10,7 @@ export class WhatsAuto implements INodeType {
     description: INodeTypeDescription = {
         displayName: 'WhatsApp Notifications by SyncMate',
         name: 'whatsAuto',
-        icon: 'file:whatsauto.svg',
+        icon: 'file:WhatsAuto/whatsauto.svg',
         group: ['output'],
         version: 1,
         subtitle: '={{$parameter["operation"]}}',
