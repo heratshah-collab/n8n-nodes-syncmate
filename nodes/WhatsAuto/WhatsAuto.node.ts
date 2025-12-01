@@ -4,6 +4,7 @@ import {
     INodeType,
     INodeTypeDescription,
     NodeOperationError,
+    NodeConnectionTypes, // Added this import
 } from 'n8n-workflow';
 
 export class WhatsAuto implements INodeType {
@@ -18,8 +19,11 @@ export class WhatsAuto implements INodeType {
         defaults: {
             name: 'WhatsAuto',
         },
-        inputs: ['main'],
-        outputs: ['main'],
+        // FIX 1 & 2: Updated connection types and added usableAsTool
+        inputs: [NodeConnectionTypes.Main],
+        outputs: [NodeConnectionTypes.Main],
+        usableAsTool: true, 
+        
         credentials: [
             {
                 name: 'assistroOAuth2Api',
@@ -27,11 +31,34 @@ export class WhatsAuto implements INodeType {
             },
         ],
         properties: [
+            // FIX 3: Added Resource Object
+            {
+                displayName: 'Resource',
+                name: 'resource',
+                type: 'options',
+                noDataExpression: true,
+                options: [
+                    {
+                        name: 'Message',
+                        value: 'message',
+                    },
+                ],
+                default: 'message',
+            },
+
             {
                 displayName: 'Operation',
                 name: 'operation',
                 type: 'options',
                 noDataExpression: true,
+                // FIX 3 (Continued): Operation now depends on Resource
+                displayOptions: {
+                    show: {
+                        resource: [
+                            'message',
+                        ],
+                    },
+                },
                 options: [
                     {
                         name: 'Send Notification',
@@ -63,6 +90,7 @@ export class WhatsAuto implements INodeType {
                 required: true,
                 displayOptions: {
                     show: {
+                        resource: ['message'],
                         operation: ['normal'],
                     },
                 },
@@ -77,6 +105,7 @@ export class WhatsAuto implements INodeType {
                 required: true,
                 displayOptions: {
                     show: {
+                        resource: ['message'],
                         operation: ['normal', 'group'],
                     },
                 },
@@ -95,6 +124,7 @@ export class WhatsAuto implements INodeType {
                 },
                 displayOptions: {
                     show: {
+                        resource: ['message'],
                         operation: ['normal', 'group'],
                     },
                 },
@@ -136,6 +166,7 @@ export class WhatsAuto implements INodeType {
                 required: true,
                 displayOptions: {
                     show: {
+                        resource: ['message'],
                         operation: ['group'],
                     },
                 },
@@ -152,6 +183,7 @@ export class WhatsAuto implements INodeType {
                 required: true,
                 displayOptions: {
                     show: {
+                        resource: ['message'],
                         operation: ['newsletter'],
                     },
                 },
@@ -166,6 +198,7 @@ export class WhatsAuto implements INodeType {
                 required: true,
                 displayOptions: {
                     show: {
+                        resource: ['message'],
                         operation: ['newsletter'],
                     },
                 },
@@ -184,6 +217,8 @@ export class WhatsAuto implements INodeType {
 
         for (let i = 0; i < items.length; i++) {
             try {
+                // Technically we should check resource here too, but since 'operation' 
+                // is unique across the node, we can continue using just operation.
                 const operation = this.getNodeParameter('operation', i) as string;
                 let body: any = {};
 
