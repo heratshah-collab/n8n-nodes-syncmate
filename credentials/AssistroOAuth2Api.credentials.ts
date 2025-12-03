@@ -27,11 +27,34 @@ export class AssistroOAuth2Api implements ICredentialType {
             default: 'https://app.assistro.co/oauth/token',
             required: true,
         },
+         {
+            displayName: 'Client ID',
+            name: 'clientId',
+            type: 'hidden',
+            default: '7',
+            required: true,
+        },
+        {
+            displayName: 'Client Secret',
+            name: 'clientSecret',
+            type: 'hidden',
+            typeOptions: { password: true },
+            default: 'Hu7Q7ruHo9tOp2MEmBvBA45bn5atNESD7naEURHw',
+            required: true,
+        },
+
         {
             displayName: 'Scope',
             name: 'scope',
             type: 'hidden',
-            default: '',
+            default: 'all',
+        },
+        {
+            displayName: 'Auth URI Query Parameters',
+            name: 'authQueryParameters',
+            type: 'hidden',
+            // ✅ Add your custom param here
+            default: 'integration_name=n8n',
         },
         {
             displayName: 'Authentication',
