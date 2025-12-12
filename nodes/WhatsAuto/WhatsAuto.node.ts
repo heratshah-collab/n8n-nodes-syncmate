@@ -4,7 +4,8 @@ import {
     INodeType,
     INodeTypeDescription,
     NodeOperationError,
-    NodeConnectionTypes, // Added this import
+    NodeConnectionTypes,
+    JsonObject,
 } from 'n8n-workflow';
 
 export class WhatsAuto implements INodeType {
@@ -19,19 +20,53 @@ export class WhatsAuto implements INodeType {
         defaults: {
             name: 'WhatsAuto',
         },
-        // FIX 1 & 2: Updated connection types and added usableAsTool
+        // Inputs & Outputs
         inputs: [NodeConnectionTypes.Main],
         outputs: [NodeConnectionTypes.Main],
-        usableAsTool: true, 
+        usableAsTool: true,
         
+        // 1. DEFINE CREDENTIALS
         credentials: [
+            {
+                name: 'assistroTokenApi',
+                required: true,
+                displayOptions: {
+                    show: {
+                        authentication: ['jwt'],
+                    },
+                },
+            },
             {
                 name: 'assistroOAuth2Api',
                 required: true,
+                displayOptions: {
+                    show: {
+                        authentication: ['oAuth2'],
+                    },
+                },
             },
         ],
+
         properties: [
-            // FIX 3: Added Resource Object
+            // 2. AUTHENTICATION SWITCHER
+            {
+                displayName: 'Authentication',
+                name: 'authentication',
+                type: 'options',
+                options: [
+                    {
+                        name: 'API Token (JWT)',
+                        value: 'jwt',
+                    },
+                    {
+                        name: 'OAuth2',
+                        value: 'oAuth2',
+                    },
+                ],
+                default: 'jwt',
+            },
+
+            // 3. RESOURCE SELECTOR
             {
                 displayName: 'Resource',
                 name: 'resource',
@@ -46,12 +81,12 @@ export class WhatsAuto implements INodeType {
                 default: 'message',
             },
 
+            // 4. OPERATION SELECTOR
             {
                 displayName: 'Operation',
                 name: 'operation',
                 type: 'options',
                 noDataExpression: true,
-                // FIX 3 (Continued): Operation now depends on Resource
                 displayOptions: {
                     show: {
                         resource: [
@@ -82,7 +117,7 @@ export class WhatsAuto implements INodeType {
                 default: 'normal',
             },
 
-            // Normal Message Fields
+            // --- FIELDS: Normal Message ---
             {
                 displayName: 'Phone Number',
                 name: 'phoneNumber',
@@ -158,7 +193,7 @@ export class WhatsAuto implements INodeType {
                 ],
             },
 
-            // Group Message Fields
+            // --- FIELDS: Group Message ---
             {
                 displayName: 'Group ID',
                 name: 'groupId',
@@ -175,7 +210,7 @@ export class WhatsAuto implements INodeType {
                 description: 'WhatsApp group ID (with or without @g.us suffix)',
             },
 
-            // Newsletter Fields
+            // --- FIELDS: Newsletter ---
             {
                 displayName: 'Channel/Newsletter ID',
                 name: 'newsletterId',
@@ -214,19 +249,23 @@ export class WhatsAuto implements INodeType {
     async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
         const items = this.getInputData();
         const returnData: INodeExecutionData[] = [];
+        const authMethod = this.getNodeParameter('authentication', 0) as string;
+
+        // console.log(`[WhatsAuto] Execution started. Items to process: ${items.length}`);
+        // console.log(`[WhatsAuto] Authentication Method: ${authMethod}`);
 
         for (let i = 0; i < items.length; i++) {
             try {
-                // Technically we should check resource here too, but since 'operation' 
-                // is unique across the node, we can continue using just operation.
                 const operation = this.getNodeParameter('operation', i) as string;
+                // console.log(`[WhatsAuto] Processing Item ${i} | Operation: ${operation}`);
+
                 let body: any = {};
 
+                // --- BUILD BODY based on Operation ---
                 if (operation === 'normal') {
                     const phoneNumber = this.getNodeParameter('phoneNumber', i) as string;
                     const message = this.getNodeParameter('message', i) as string;
                     const mediaFiles = this.getNodeParameter('mediaFiles', i) as any;
-
                     const cleanNumber = phoneNumber.trim().replace(/\s+/g, '');
                     
                     const msgObj: any = {
@@ -241,11 +280,9 @@ export class WhatsAuto implements INodeType {
                             file_name: file.file_name,
                         }));
                     }
-
                     body = { msgs: [msgObj] };
-                }
-
-                if (operation === 'group') {
+                } 
+                else if (operation === 'group') {
                     const groupId = this.getNodeParameter('groupId', i) as string;
                     const message = this.getNodeParameter('message', i) as string;
                     const mediaFiles = this.getNodeParameter('mediaFiles', i) as any;
@@ -267,11 +304,9 @@ export class WhatsAuto implements INodeType {
                             file_name: file.file_name,
                         }));
                     }
-
                     body = { msgs: [msgObj] };
-                }
-
-                if (operation === 'newsletter') {
+                } 
+                else if (operation === 'newsletter') {
                     const newsletterId = this.getNodeParameter('newsletterId', i) as string;
                     const message = this.getNodeParameter('newsletterMessage', i) as string;
 
@@ -279,7 +314,6 @@ export class WhatsAuto implements INodeType {
                     if (!cleanNewsletterId.endsWith('@newsletter')) {
                         cleanNewsletterId = cleanNewsletterId.replace('@newsletter', '') + '@newsletter';
                     }
-
                     body = {
                         msgs: [{
                             number: cleanNewsletterId,
@@ -289,27 +323,58 @@ export class WhatsAuto implements INodeType {
                     };
                 }
 
-                const response = await this.helpers.httpRequestWithAuthentication.call(
-                    this,
-                    'assistroOAuth2Api',
-                    {
-                        method: 'POST',
-                        url: 'https://app.assistro.co/api/v1/wapushplus/singlePass/message',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Integration' : 'n8n',
-                        },
-                        body,
-                        json: true,
+                // console.log(`[WhatsAuto] Item ${i} Payload:`, JSON.stringify(body, null, 2));
+
+                // --- 2. Determine URI based on Auth Method ---
+                let endpointUri = '';
+                if (authMethod === 'oAuth2') {
+                    endpointUri = 'https://app.assistro.co/api/v1/wapushplus/singlePass/message';
+                } else {
+                    endpointUri = 'https://app.assistro.co/api/v1/wapushplus/single/message';
+                }
+
+                // console.log(`[WhatsAuto] Sending Request to: ${endpointUri}`);
+
+                // --- 3. Prepare Request (FIXED: used 'url' instead of 'uri') ---
+                const requestOptions: any = {
+                    method: 'POST',
+                    url: endpointUri, // Changed from uri to url
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Integration' : 'n8n',
                     },
-                );
+                    body,
+                    json: true,
+                };
+
+                let response;
+
+                // --- EXECUTE REQUEST BASED ON AUTH TYPE ---
+                if (authMethod === 'oAuth2') {
+                    response = await this.helpers.httpRequestWithAuthentication.call(
+                        this,
+                        'assistroOAuth2Api', 
+                        requestOptions
+                    );
+                } else {
+                    const credentials = await this.getCredentials('assistroTokenApi');
+                    requestOptions.headers['Authorization'] = `Bearer ${credentials.accessToken}`;
+                    response = await this.helpers.httpRequest(requestOptions);
+                }
+
+                // console.log(`[WhatsAuto] Item ${i} Success Response:`, response);
 
                 returnData.push({
-                    json: response,
+                    json: response as JsonObject,
                     pairedItem: { item: i },
                 });
 
             } catch (error: any) {
+                console.error(`[WhatsAuto] Item ${i} Failed:`, error.message);
+                if (error.response) {
+                     console.error(`[WhatsAuto] Error Response Body:`, error.response.body);
+                }
+
                 if (this.continueOnFail()) {
                     returnData.push({
                         json: {
@@ -319,26 +384,11 @@ export class WhatsAuto implements INodeType {
                     });
                     continue;
                 }
-
-                if (error.response?.status === 401 || error.response?.status === 403) {
-                    throw new NodeOperationError(
-                        this.getNode(),
-                        'Authentication failed. Please reconnect your OAuth credentials.',
-                        { itemIndex: i }
-                    );
-                }
-
-                if (error.response?.status === 500) {
-                    throw new NodeOperationError(
-                        this.getNode(),
-                        'Server error. Your access token may have expired. Please reconnect OAuth credentials.',
-                        { itemIndex: i }
-                    );
-                }
-
+                
+                const errorMsg = error.message || 'Unknown error';
                 throw new NodeOperationError(
                     this.getNode(),
-                    `Failed to send message: ${error.message}`,
+                    `Failed to send message: ${errorMsg}`,
                     { itemIndex: i }
                 );
             }
