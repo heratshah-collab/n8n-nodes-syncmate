@@ -251,13 +251,9 @@ export class WhatsAuto implements INodeType {
         const returnData: INodeExecutionData[] = [];
         const authMethod = this.getNodeParameter('authentication', 0) as string;
 
-        // console.log(`[WhatsAuto] Execution started. Items to process: ${items.length}`);
-        // console.log(`[WhatsAuto] Authentication Method: ${authMethod}`);
-
         for (let i = 0; i < items.length; i++) {
             try {
                 const operation = this.getNodeParameter('operation', i) as string;
-                // console.log(`[WhatsAuto] Processing Item ${i} | Operation: ${operation}`);
 
                 let body: any = {};
 
@@ -323,7 +319,6 @@ export class WhatsAuto implements INodeType {
                     };
                 }
 
-                // console.log(`[WhatsAuto] Item ${i} Payload:`, JSON.stringify(body, null, 2));
 
                 // --- 2. Determine URI based on Auth Method ---
                 let endpointUri = '';
@@ -333,7 +328,6 @@ export class WhatsAuto implements INodeType {
                     endpointUri = 'https://app.assistro.co/api/v1/wapushplus/single/message';
                 }
 
-                // console.log(`[WhatsAuto] Sending Request to: ${endpointUri}`);
 
                 // --- 3. Prepare Request (FIXED: used 'url' instead of 'uri') ---
                 const requestOptions: any = {
@@ -362,7 +356,6 @@ export class WhatsAuto implements INodeType {
                     response = await this.helpers.httpRequest(requestOptions);
                 }
 
-                // console.log(`[WhatsAuto] Item ${i} Success Response:`, response);
 
                 returnData.push({
                     json: response as JsonObject,
@@ -370,25 +363,23 @@ export class WhatsAuto implements INodeType {
                 });
 
             } catch (error: any) {
-                console.error(`[WhatsAuto] Item ${i} Failed:`, error.message);
-                if (error.response) {
-                     console.error(`[WhatsAuto] Error Response Body:`, error.response.body);
-                }
-
+                // If "Continue on Fail" is enabled in the node settings
                 if (this.continueOnFail()) {
                     returnData.push({
                         json: {
                             error: error.message,
+                            // Optionally include more detail without using console
+                            details: error.response?.body || undefined,
                         },
                         pairedItem: { item: i },
                     });
                     continue;
                 }
                 
-                const errorMsg = error.message || 'Unknown error';
+                // Otherwise, throw a standard n8n error which appears in the UI
                 throw new NodeOperationError(
                     this.getNode(),
-                    `Failed to send message: ${errorMsg}`,
+                    error, // Passing the full error object provides better context in the UI
                     { itemIndex: i }
                 );
             }
