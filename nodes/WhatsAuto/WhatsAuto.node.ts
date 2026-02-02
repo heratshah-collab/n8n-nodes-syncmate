@@ -30,42 +30,10 @@ export class WhatsAuto implements INodeType {
             {
                 name: 'assistroTokenApi',
                 required: true,
-                displayOptions: {
-                    show: {
-                        authentication: ['jwt'],
-                    },
-                },
-            },
-            {
-                name: 'assistroOAuth2Api',
-                required: true,
-                displayOptions: {
-                    show: {
-                        authentication: ['oAuth2'],
-                    },
-                },
             },
         ],
 
         properties: [
-            // 2. AUTHENTICATION SWITCHER
-            {
-                displayName: 'Authentication',
-                name: 'authentication',
-                type: 'options',
-                options: [
-                    {
-                        name: 'API Token (JWT)',
-                        value: 'jwt',
-                    },
-                    {
-                        name: 'OAuth2',
-                        value: 'oAuth2',
-                    },
-                ],
-                default: 'jwt',
-            },
-
             // 3. RESOURCE SELECTOR
             {
                 displayName: 'Resource',
@@ -249,7 +217,6 @@ export class WhatsAuto implements INodeType {
     async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
         const items = this.getInputData();
         const returnData: INodeExecutionData[] = [];
-        const authMethod = this.getNodeParameter('authentication', 0) as string;
 
         for (let i = 0; i < items.length; i++) {
             try {
@@ -321,12 +288,7 @@ export class WhatsAuto implements INodeType {
 
 
                 // --- 2. Determine URI based on Auth Method ---
-                let endpointUri = '';
-                if (authMethod === 'oAuth2') {
-                    endpointUri = 'https://app.assistro.co/api/v1/wapushplus/singlePass/message';
-                } else {
-                    endpointUri = 'https://app.assistro.co/api/v1/wapushplus/single/message';
-                }
+                const endpointUri = 'https://app.assistro.co/api/v1/wapushplus/single/message';
 
 
                 // --- 3. Prepare Request (FIXED: used 'url' instead of 'uri') ---
@@ -344,17 +306,9 @@ export class WhatsAuto implements INodeType {
                 let response;
 
                 // --- EXECUTE REQUEST BASED ON AUTH TYPE ---
-                if (authMethod === 'oAuth2') {
-                    response = await this.helpers.httpRequestWithAuthentication.call(
-                        this,
-                        'assistroOAuth2Api', 
-                        requestOptions
-                    );
-                } else {
-                    const credentials = await this.getCredentials('assistroTokenApi');
-                    requestOptions.headers['Authorization'] = `Bearer ${credentials.accessToken}`;
-                    response = await this.helpers.httpRequest(requestOptions);
-                }
+                const credentials = await this.getCredentials('assistroTokenApi');
+                requestOptions.headers['Authorization'] = `Bearer ${credentials.accessToken}`;
+                response = await this.helpers.httpRequest(requestOptions);
 
 
                 returnData.push({
@@ -377,8 +331,7 @@ export class WhatsAuto implements INodeType {
                 }
                 
                 // Otherwise, throw a standard n8n error which appears in the UI
-                throw new NodeOperationError(
-                    this.getNode(),
+                throw new NodeOperationError(                    this.getNode(),
                     error, // Passing the full error object provides better context in the UI
                     { itemIndex: i }
                 );

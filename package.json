@@ -44,7 +44,7 @@
       "dist/nodes/WhatsAuto/WhatsAuto.node.js"
     ],
     "credentials": [
-      "dist/credentials/AssistroOAuth2Api.credentials.js"
+      "dist/credentials/AssistroTokenApi.credentials.js"
     ]
   },
   "devDependencies": {
