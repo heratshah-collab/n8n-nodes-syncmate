@@ -24,8 +24,8 @@ importers:
         specifier: ^4.0.2
         version: 4.0.2
       n8n-workflow:
-        specifier: ^1.53.0
-        version: 1.115.0
+        specifier: ^1.119.1
+        version: 1.120.13
       prettier:
         specifier: ^3.3.2
         version: 3.6.2
@@ -1109,6 +1109,10 @@ packages:
   json-stable-stringify-without-jsonify@1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
 
+  jsonrepair@3.13.2:
+    resolution: {integrity: sha512-Leuly0nbM4R+S5SVJk3VHfw1oxnlEK9KygdZvfUtEtTawNDyzB4qa1xWTmFt1aeoA7sXZkVTRuIixJ8bAvqVUg==}
+    hasBin: true
+
   jssha@3.3.1:
     resolution: {integrity: sha512-VCMZj12FCFMQYcFLPRm/0lOBbLi8uM2BhXPTqw3U4YAfs4AZfiApOoBLoN8cQE60Z50m1MYMTQVCfgF/KaCVhQ==}
 
@@ -1169,8 +1173,8 @@ packages:
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
-  lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+  lodash@4.18.1:
+    resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
 
   lower-case@2.0.2:
     resolution: {integrity: sha512-7fm3l3NAF9WfN6W3JOmf5drwpVqX78JtoGJ3A6W0a6ZnldM41w2fV5D490psKFTpMds8TJse/eHLFFsNHHjHgg==}
@@ -1247,8 +1251,8 @@ packages:
     resolution: {integrity: sha512-kDcwXR4PS7caBpuRYYBUz9iVixUk3anO3f5OYFiIPwK/20vCzKCHyKoulbiDY1S53zD2bxUpxN/IJ+TnXjfvxg==}
     engines: {node: '>= 0.10'}
 
-  n8n-workflow@1.115.0:
-    resolution: {integrity: sha512-O1DaB10/3wWBr8xT9DYhYC+7B1yy5gxLDEpe0FgYjaUwNjNqMzqTzz/oVPnmV7DEwdUKj+xri1inZ/YozpQ39Q==}
+  n8n-workflow@1.120.13:
+    resolution: {integrity: sha512-k6OTN1Aa/ua/ECpWstLKHK6Fw3gndvNtWhXTopd5mRsZzNASu28VJ7QtPMSZMgGGDzGKOBVrBBjvnkkR4xFw/A==}
 
   nan@2.23.0:
     resolution: {integrity: sha512-1UxuyYGdoQHcGg87Lkqm3FzefucTa0NAiOcuRsDmysep3c1LVCRK2krrUDafMWtjSG04htvAmvg96+SDknOmgQ==}
@@ -3183,6 +3187,8 @@ snapshots:
 
   json-stable-stringify-without-jsonify@1.0.1: {}
 
+  jsonrepair@3.13.2: {}
+
   jssha@3.3.1: {}
 
   just-debounce@1.1.0: {}
@@ -3252,7 +3258,7 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
-  lodash@4.17.21: {}
+  lodash@4.18.1: {}
 
   lower-case@2.0.2:
     dependencies:
@@ -3341,18 +3347,19 @@ snapshots:
 
   mute-stdout@1.0.1: {}
 
-  n8n-workflow@1.115.0:
+  n8n-workflow@1.120.13:
     dependencies:
       '@n8n/errors': 0.5.0
       '@n8n/tournament': 1.0.6
-      ast-types: 0.15.2
+      ast-types: 0.16.1
       callsites: 3.1.0
       esprima-next: 5.8.4
       form-data: 4.0.0
       jmespath: 0.16.0
       js-base64: 3.7.2
+      jsonrepair: 3.13.2
       jssha: 3.3.1
-      lodash: 4.17.21
+      lodash: 4.18.1
       luxon: 3.4.4
       md5: 2.3.0
       recast: 0.22.0

@@ -1,6 +1,7 @@
 import {
 	ICredentialType,
 	INodeProperties,
+	IAuthenticateGeneric,
 } from 'n8n-workflow';
 
 export class AssistroTokenApi implements ICredentialType {
@@ -18,4 +19,12 @@ export class AssistroTokenApi implements ICredentialType {
 			description: 'The JWT Access Token provided by Assistro',
 		},
 	];
+	authenticate = {
+		type: 'generic',
+		properties: {
+			headers: {
+				Authorization: '={{"Bearer " + $credentials.accessToken}}',
+			},
+		},
+	} as IAuthenticateGeneric;
 }

@@ -11,7 +11,7 @@ Send WhatsApp messages or media using **SyncMate Assistro API** in n8n workflows
 
 - Send text messages via WhatsApp
 - Send images, videos, documents, and other media
-- OAuth2 authentication with Assistro API
+- API Token authentication with Assistro API
 - Designed for **n8n workflows**
 - Easy to integrate into existing automation
 

@@ -229,7 +229,7 @@ export class WhatsAuto implements INodeType {
                     const phoneNumber = this.getNodeParameter('phoneNumber', i) as string;
                     const message = this.getNodeParameter('message', i) as string;
                     const mediaFiles = this.getNodeParameter('mediaFiles', i) as any;
-                    const cleanNumber = phoneNumber.trim().replace(/\s+/g, '');
+                    const cleanNumber = String(phoneNumber).trim().replace(/\s+/g, '');
                     
                     const msgObj: any = {
                         number: cleanNumber,
@@ -250,7 +250,7 @@ export class WhatsAuto implements INodeType {
                     const message = this.getNodeParameter('message', i) as string;
                     const mediaFiles = this.getNodeParameter('mediaFiles', i) as any;
 
-                    let cleanGroupId = groupId.trim();
+                    let cleanGroupId = String(groupId).trim();
                     if (!cleanGroupId.endsWith('@g.us')) {
                         cleanGroupId = cleanGroupId.replace('@g.us', '') + '@g.us';
                     }
@@ -273,7 +273,7 @@ export class WhatsAuto implements INodeType {
                     const newsletterId = this.getNodeParameter('newsletterId', i) as string;
                     const message = this.getNodeParameter('newsletterMessage', i) as string;
 
-                    let cleanNewsletterId = newsletterId.trim();
+                    let cleanNewsletterId = String(newsletterId).trim();
                     if (!cleanNewsletterId.endsWith('@newsletter')) {
                         cleanNewsletterId = cleanNewsletterId.replace('@newsletter', '') + '@newsletter';
                     }
