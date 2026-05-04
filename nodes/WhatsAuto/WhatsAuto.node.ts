@@ -305,10 +305,7 @@ export class WhatsAuto implements INodeType {
 
                 let response;
 
-                // --- EXECUTE REQUEST BASED ON AUTH TYPE ---
-                const credentials = await this.getCredentials('assistroTokenApi');
-                requestOptions.headers['Authorization'] = `Bearer ${credentials.accessToken}`;
-                response = await this.helpers.httpRequest(requestOptions);
+                response = await this.helpers.httpRequestWithAuthentication.call(this, 'assistroTokenApi', requestOptions);
 
 
                 returnData.push({
