@@ -5,30 +5,46 @@ on:
     tags:
       - 'v*'
 
+# Force GitHub Actions to use Node.js 24 internally (future-proof)
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions:
   contents: read
-  id-token: write
+  id-token: write # REQUIRED for npm provenance
 
 jobs:
   publish:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # Checkout code
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
+      # Setup pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
           version: 9
 
-      - uses: actions/setup-node@v4
+      # Setup Node.js
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20' # your project runtime
           registry-url: 'https://registry.npmjs.org'
 
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run build
+      # Install deps
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Publish with provenance
+      # Build project
+      - name: Build
+        run: pnpm run build
+
+      # Publish with provenance
+      - name: Publish package
         run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
