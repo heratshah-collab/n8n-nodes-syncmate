@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-syncmate",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Send WhatsApp messages, media and Meta templates using SyncMate Assistro API.",
   "publishConfig": {
     "access": "public"
