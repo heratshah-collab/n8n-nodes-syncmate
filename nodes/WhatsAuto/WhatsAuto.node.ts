@@ -14,8 +14,13 @@ import {
     ResourceMapperFields,
 } from 'n8n-workflow';
 
-// Production by default; set ASSISTRO_BASE_URL on the n8n process to point a local n8n at staging or laravel.test.
-const BASE_URL = (process.env.ASSISTRO_BASE_URL || 'https://app.assistro.co/api/v1').replace(/\/+$/, '');
+const DEFAULT_BASE_URL = 'https://app.assistro.co/api/v1';
+
+// The API root comes from the credential's Base URL field (production unless changed there).
+async function getBaseUrl(this: IExecuteFunctions | ILoadOptionsFunctions): Promise<string> {
+    const credentials = await this.getCredentials('assistroTokenApi');
+    return (String(credentials.baseUrl ?? '').trim() || DEFAULT_BASE_URL).replace(/\/+$/, '');
+}
 
 const LANGUAGE_OPTIONS = [
     { name: 'Arabic', value: 'ar' },
@@ -131,19 +136,19 @@ export class WhatsAuto implements INodeType {
                         name: 'Send Message to Contact',
                         value: 'normal',
                         description: 'Send a message to one phone number (direct chat)',
-                        action: 'Standard: Send message to contact',
+                        action: 'Send message to contact',
                     },
                     {
                         name: 'Send Message to Group',
                         value: 'group',
                         description: 'Send a message to a WhatsApp group',
-                        action: 'Standard: Send message to group',
+                        action: 'Send message to group',
                     },
                     {
                         name: 'Send Message to Channel',
                         value: 'newsletter',
                         description: 'Post to a WhatsApp channel (newsletter)',
-                        action: 'Standard: Send message to channel',
+                        action: 'Send message to channel',
                     },
                 ],
                 default: 'normal',
@@ -163,19 +168,19 @@ export class WhatsAuto implements INodeType {
                         name: 'Send Media',
                         value: 'metaSendMedia',
                         description: 'Send an image, video, document or audio file',
-                        action: 'Meta: Send media message',
+                        action: 'Send media message',
                     },
                     {
                         name: 'Send Template',
                         value: 'metaSendTemplate',
                         description: 'Send an approved template message (works outside the 24-hour window)',
-                        action: 'Meta: Send template message',
+                        action: 'Send template message',
                     },
                     {
                         name: 'Send Text',
                         value: 'metaSendText',
                         description: 'Send a free-form text message (within the 24-hour customer service window)',
-                        action: 'Meta: Send text message',
+                        action: 'Send text message',
                     },
                 ],
                 default: 'metaSendText',
@@ -195,7 +200,7 @@ export class WhatsAuto implements INodeType {
                         name: 'Get Many',
                         value: 'metaGetAllTemplates',
                         description: 'List message templates with their approval status',
-                        action: 'Meta: Get many templates',
+                        action: 'Get many templates',
                     },
                 ],
                 default: 'metaGetAllTemplates',
@@ -382,7 +387,7 @@ export class WhatsAuto implements INodeType {
                     },
                 },
                 default: '',
-                description: 'Approved template to send. Choose from the list, or specify a name using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+                description: 'Approved template to send. Choose from the list, or specify a name using an <a href="https://docs.n8n.io/code/expressions/">expression</a>. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
             },
             {
                 displayName: 'Language Code',
@@ -574,7 +579,7 @@ export class WhatsAuto implements INodeType {
                 },
                 options: [
                     { name: 'Audio', value: 'audio', description: 'AAC, MP3, OGG, AMR (max 16MB)' },
-                    { name: 'Document', value: 'document', description: 'PDF, DOC, XLS, PPT, etc. (max 100MB)' },
+                    { name: 'Document', value: 'document', description: 'PDF, DOC, XLS, PPT, etc. (max 100MB).' },
                     { name: 'Image', value: 'image', description: 'JPEG, PNG (max 5MB)' },
                     { name: 'Video', value: 'video', description: 'MP4, 3GPP (max 16MB)' },
                 ],
@@ -712,7 +717,7 @@ export class WhatsAuto implements INodeType {
         loadOptions: {
             // Templates for the Template Name dropdown, from the connection the token belongs to.
             async getTemplates(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-                const url = `${BASE_URL}/meta/templates`;
+                const url = `${await getBaseUrl.call(this)}/meta/templates`;
                 let response: IDataObject;
                 try {
                     response = (await this.helpers.httpRequestWithAuthentication.call(this, 'assistroTokenApi', {
@@ -753,7 +758,7 @@ export class WhatsAuto implements INodeType {
                     return { fields: [], emptyFieldsNotice: 'Choose a template first' };
                 }
 
-                const url = `${BASE_URL}/meta/messages/template-schema`;
+                const url = `${await getBaseUrl.call(this)}/meta/messages/template-schema`;
                 let schema: IDataObject;
                 try {
                     schema = (await this.helpers.httpRequestWithAuthentication.call(this, 'assistroTokenApi', {
@@ -793,6 +798,7 @@ export class WhatsAuto implements INodeType {
     async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
         const items = this.getInputData();
         const returnData: INodeExecutionData[] = [];
+        const baseUrl = await getBaseUrl.call(this);
 
         for (let i = 0; i < items.length; i++) {
             try {
@@ -801,8 +807,8 @@ export class WhatsAuto implements INodeType {
 
                 const requestOptions: IHttpRequestOptions =
                     resource === 'metaMessage' || resource === 'metaTemplate'
-                        ? await buildMetaRequest.call(this, operation, i)
-                        : buildNonMetaRequest.call(this, operation, i);
+                        ? await buildMetaRequest.call(this, baseUrl, operation, i)
+                        : buildNonMetaRequest.call(this, baseUrl, operation, i);
 
                 // A multipart upload sets its own Content-Type (with the boundary).
                 requestOptions.headers = requestOptions.body instanceof FormData
@@ -843,7 +849,7 @@ export class WhatsAuto implements INodeType {
     }
 }
 
-function buildNonMetaRequest(this: IExecuteFunctions, operation: string, i: number): IHttpRequestOptions {
+function buildNonMetaRequest(this: IExecuteFunctions, baseUrl: string, operation: string, i: number): IHttpRequestOptions {
     let body: any = {};
 
     // --- BUILD BODY based on Operation ---
@@ -913,7 +919,7 @@ function buildNonMetaRequest(this: IExecuteFunctions, operation: string, i: numb
 
     return {
         method: 'POST',
-        url: `${BASE_URL}/wapushplus/single/message`,
+        url: `${baseUrl}/wapushplus/single/message`,
         body,
     };
 }
@@ -924,7 +930,7 @@ function buildNonMetaRequest(this: IExecuteFunctions, operation: string, i: numb
  * `text: { body }` object is not read. Template variables go in Meta-style
  * `components`, which the backend converts for Whatomate.
  */
-async function buildMetaRequest(this: IExecuteFunctions, operation: string, i: number): Promise<IHttpRequestOptions> {
+async function buildMetaRequest(this: IExecuteFunctions, baseUrl: string, operation: string, i: number): Promise<IHttpRequestOptions> {
     if (operation === 'metaGetAllTemplates') {
         const statusFilter = this.getNodeParameter('statusFilter', i, 'all') as string;
         const limit = this.getNodeParameter('limit', i, 50) as number;
@@ -936,7 +942,7 @@ async function buildMetaRequest(this: IExecuteFunctions, operation: string, i: n
 
         return {
             method: 'GET',
-            url: `${BASE_URL}/meta/templates`,
+            url: `${baseUrl}/meta/templates`,
             qs,
         };
     }
@@ -946,7 +952,7 @@ async function buildMetaRequest(this: IExecuteFunctions, operation: string, i: n
     if (operation === 'metaSendText') {
         return {
             method: 'POST',
-            url: `${BASE_URL}/meta/messages/text`,
+            url: `${baseUrl}/meta/messages/text`,
             body: {
                 to,
                 type: 'text',
@@ -1021,7 +1027,7 @@ async function buildMetaRequest(this: IExecuteFunctions, operation: string, i: n
 
         return {
             method: 'POST',
-            url: `${BASE_URL}/meta/messages/template`,
+            url: `${baseUrl}/meta/messages/template`,
             body,
         };
     }
@@ -1063,14 +1069,14 @@ async function buildMetaRequest(this: IExecuteFunctions, operation: string, i: n
 
             return {
                 method: 'POST',
-                url: `${BASE_URL}/meta/messages/media`,
+                url: `${baseUrl}/meta/messages/media`,
                 body: form,
             };
         }
 
         return {
             method: 'POST',
-            url: `${BASE_URL}/meta/messages/media`,
+            url: `${baseUrl}/meta/messages/media`,
             body,
         };
     }

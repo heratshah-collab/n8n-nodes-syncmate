@@ -37,6 +37,8 @@
     "lint": "eslint nodes/**/*.ts credentials/**/*.ts",
     "lintfix": "eslint nodes credentials --fix",
     "test": "npm run build && node --test test/WhatsAuto.test.js",
+    "release": "npm run lint && npm test && npm version patch && git push origin HEAD --follow-tags",
+    "release:minor": "npm run lint && npm test && npm version minor && git push origin HEAD --follow-tags",
     "prepublishOnly": "pnpm run build"
   },
   "files": [

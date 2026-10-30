@@ -1,10 +1,9 @@
 // Every WhatsAuto use case against the built node (dist/), with a mocked n8n context:
 // no network, nothing is sent. Run with `npm test` (builds first).
-process.env.ASSISTRO_BASE_URL = 'https://api.example.test/api/v1/';
-
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { WhatsAuto } = require('../dist/nodes/WhatsAuto/WhatsAuto.node.js');
+const { AssistroTokenApi } = require('../dist/credentials/AssistroTokenApi.credentials.js');
 
 const BASE = 'https://api.example.test/api/v1';
 const NUM = '919998798844';
@@ -15,7 +14,7 @@ function getPath(obj, path) {
 
 // A minimal IExecuteFunctions / ILoadOptionsFunctions: parameters come from `params`,
 // every HTTP call is recorded and answered by `respond`.
-function context(params, { respond = () => ({ success: true }), binary, continueOnFail = false, items = 1 } = {}) {
+function context(params, { respond = () => ({ success: true }), binary, continueOnFail = false, items = 1, credentials = { accessToken: 't', baseUrl: 'https://api.example.test/api/v1/' } } = {}) {
     const calls = [];
     const node = { name: 'WhatsAuto', type: 'CUSTOM.whatsAuto', typeVersion: 1, parameters: params };
     const getNodeParameter = (name, _i, fallback) => {
@@ -30,6 +29,10 @@ function context(params, { respond = () => ({ success: true }), binary, continue
         getInputData: () => Array.from({ length: items }, () => ({ json: {} })),
         getNodeParameter,
         continueOnFail: () => continueOnFail,
+        getCredentials: async (name) => {
+            assert.equal(name, 'assistroTokenApi');
+            return credentials;
+        },
         helpers: {
             httpRequestWithAuthentication: async (credential, options) => {
                 calls.push({ credential, ...options });
@@ -53,19 +56,19 @@ async function run(params, opts) {
 
 // ─── Node description ──────────────────────────────────────────────
 
-test('description: every action is listed with its connection type', () => {
+test('description: every action is listed', () => {
     const d = new WhatsAuto().description;
     const actions = d.properties
         .filter((p) => p.name === 'operation')
         .flatMap((p) => p.options.map((o) => o.action));
     assert.deepEqual(actions.sort(), [
-        'Meta: Get many templates',
-        'Meta: Send media message',
-        'Meta: Send template message',
-        'Meta: Send text message',
-        'Standard: Send message to channel',
-        'Standard: Send message to contact',
-        'Standard: Send message to group',
+        'Get many templates',
+        'Send media message',
+        'Send message to channel',
+        'Send message to contact',
+        'Send message to group',
+        'Send template message',
+        'Send text message',
     ]);
 });
 
@@ -395,4 +398,28 @@ test('variables: an API error is readable', async () => {
         throw e;
     });
     await assert.rejects(result, /Could not load template variables \(401\)/);
+});
+
+// ─── Credential ────────────────────────────────────────────────────
+
+test('credential: base URL defaults to production when left empty', async () => {
+    const { call } = await run(
+        { resource: 'metaMessage', operation: 'metaSendText', recipientPhone: NUM, messageText: 'x' },
+        { credentials: { accessToken: 't', baseUrl: '' } },
+    );
+    assert.equal(call.url, 'https://app.assistro.co/api/v1/meta/messages/text');
+});
+
+test('credential: Bearer token, Base URL field and a connection test', () => {
+    const c = new AssistroTokenApi();
+    assert.equal(c.name, 'assistroTokenApi', 'name must not change: saved credentials refer to it');
+    assert.equal(c.authenticate.properties.headers.Authorization, '={{"Bearer " + $credentials.accessToken}}');
+    assert.equal(c.properties.find((p) => p.name === 'baseUrl').default, 'https://app.assistro.co/api/v1');
+    assert.equal(c.test.request.url, '/me');
+    assert.ok(c.icon);
+});
+
+test('node: never reads process.env (not allowed for verified nodes)', () => {
+    const src = require('fs').readFileSync(require.resolve('../dist/nodes/WhatsAuto/WhatsAuto.node.js'), 'utf8');
+    assert.ok(!/process.env/.test(src));
 });

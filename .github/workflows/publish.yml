@@ -39,11 +39,27 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # The tag must name the version in package.json, or npm would publish something else
+      - name: Check tag matches package.json
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PKG="$(node -p "require('./package.json').version")"
+          if [ "$TAG" != "$PKG" ]; then
+            echo "Tag v$TAG does not match package.json version $PKG"; exit 1
+          fi
+
       # Build project
       - name: Build
         run: pnpm run build
 
+      # Nothing is published unless lint and the offline tests pass
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Test
+        run: node --test test/WhatsAuto.test.js
+
       # Publish through npm trusted publishing: npm checks this repo + workflow via OIDC
-      # (id-token: write above), so no NPM_TOKEN secret is used. Provenance is added automatically.
+      # (id-token: write above), so no NPM_TOKEN secret is used. n8n verification requires provenance.
       - name: Publish package
-        run: npm publish --access public
+        run: npm publish --provenance --access public

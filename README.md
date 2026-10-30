@@ -34,7 +34,8 @@ See the [n8n community nodes installation guide](https://docs.n8n.io/integration
 ## Credentials
 
 1. Sign in to your SyncMate / Assistro account and copy your **API access token**.
-2. In n8n, create an **Assistro API Token** credential and paste the token into **Access Token**.
+2. In n8n, create an **Assistro Token API** credential and paste the token into **Access Token**. Leave **Base URL** as it is.
+3. Click **Save**. n8n tests the token straight away.
 
 The token decides which WhatsApp number sends the message. Each connected number has its own token.
 
@@ -114,7 +115,7 @@ npm test          # builds, then runs the offline test suite (no messages are se
 npm run lint
 ```
 
-To point a local n8n at another backend, set `ASSISTRO_BASE_URL` on the n8n process (default `https://app.assistro.co/api/v1`).
+To test against another backend (staging or local), change **Base URL** in the Assistro Token API credential (default `https://app.assistro.co/api/v1`).
 
 ## Support
 
