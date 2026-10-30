@@ -32,7 +32,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # your project runtime
+          node-version: '24' # ships npm 11, which trusted publishing (OIDC) requires
           registry-url: 'https://registry.npmjs.org'
 
       # Install deps
@@ -43,8 +43,7 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      # Publish with provenance
+      # Publish through npm trusted publishing: npm checks this repo + workflow via OIDC
+      # (id-token: write above), so no NPM_TOKEN secret is used. Provenance is added automatically.
       - name: Publish package
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
